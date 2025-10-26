@@ -10,30 +10,53 @@ function App() {
   const [checkerboard, setCheckerboard] = useState({ cols: 7, rows: 5 });
   const [steps, setSteps] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const stepsRef = useRef(null);
 
   const handleProcessImage = async () => {
-    if (!uploadedImage) return alert("Please upload an image first!");
+    setErrorMessage(""); // clear any old error
+    if (!uploadedImage) {
+      setErrorMessage("Please upload an image first!");
+      return;
+    }
+
+    const colsNum = parseInt(checkerboard.cols);
+    const rowsNum = parseInt(checkerboard.rows);
+
+    // Validate input values
+    if (isNaN(colsNum) || isNaN(rowsNum) || colsNum < 2 || rowsNum < 2) {
+      setErrorMessage("Please enter valid numbers for columns and rows (minimum 2 each).");
+      return;
+    }
+
     setLoading(true);
     const formData = new FormData();
     formData.append("image", uploadedImage);
-    formData.append("cols", checkerboard.cols);
-    formData.append("rows", checkerboard.rows);
+    formData.append("cols", colsNum);
+    formData.append("rows", rowsNum);
 
     try {
       const res = await fetch(`${BASE_URL}/api/process_image`, {
         method: "POST",
-        body: formData
+        body: formData,
       });
-      const data = await res.json();
-      setSteps(data.steps);
 
-      // Scroll to steps section after processing
+      if (!res.ok) {
+        throw new Error("Processing failed. Please check your image or corner values.");
+      }
+
+      const data = await res.json();
+
+      if (!data.steps || data.steps.length === 0) {
+        throw new Error("No valid calibration steps found. Try adjusting the corner count.");
+      }
+
+      setSteps(data.steps);
       stepsRef.current?.scrollIntoView({ behavior: "smooth" });
     } catch (err) {
       console.error(err);
-      alert("Backend not reachable!");
+      setErrorMessage(err.message || "An unexpected error occurred while processing the image.");
     } finally {
       setLoading(false);
     }
@@ -70,6 +93,12 @@ function App() {
           onProcess={handleProcessImage}
           loading={loading}
         />
+
+        {errorMessage && (
+          <div className="text-red-600 font-semibold mt-3 bg-red-50 px-4 py-2 rounded-lg shadow-sm max-w-md">
+            {errorMessage}
+          </div>
+        )}
 
         {/* Steps */}
         <div ref={stepsRef} id="steps-container" className="space-y-6">
