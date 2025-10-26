@@ -12,7 +12,7 @@ export default function ImageUpload({ uploadedImage, setUploadedImage, checkerbo
   };
 
   return (
-    <div className="bg-gray-200 shadow-lg rounded-xl p-6 mb-6 max-w-xl mx-auto text-center">
+    <div className="bg-white shadow-lg rounded-xl p-6 mb-6 max-w-xl mx-auto text-center">
       <h1 className="text-xl font-semibold mb-4">Upload Checkerboard Image</h1>
       <p className="mb-4 text-gray-600">Upload a single checkerboard or planar grid/floor image. For best results, use an oblique view.</p>
 

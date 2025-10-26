@@ -1,6 +1,6 @@
 const StepCard = ({ step, stepNumber }) => {
   return (
-    <div className="max-w-4xl mx-auto bg-gray-200 p-6 rounded-xl shadow-md">
+    <div className="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-md">
       <h2 className="font-semibold text-xl mb-2">
         {step.title}
       </h2>
